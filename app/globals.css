@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Page & surfaces */
+    --tv-bg-page:        #0d1117;   /* outermost background */
+    --tv-bg-panel:       #161b22;   /* cards, sidebars, panels */
+    --tv-bg-elevated:    #1c2128;   /* inputs, dropdowns, hover states */
+    --tv-bg-overlay:     #21262d;   /* tooltips, popovers */
+
+    /* Borders */
+    --tv-border-subtle:  #21262d;   /* default card borders */
+    --tv-border-default: #30363d;   /* inputs, separators */
+    --tv-border-strong:  #484f58;   /* active/focused elements */
+
+    /* Text */
+    --tv-text-primary:   #e6edf3;   /* headings, main values */
+    --tv-text-secondary: #8b949e;   /* labels, subtitles, muted */
+    --tv-text-tertiary:  #484f58;   /* placeholders, disabled */
+
+    /* Semantic */
+    --tv-green:          #3fb950;   /* price up, buy, positive */
+    --tv-green-muted:    #1a3a24;   /* green badge background */
+    --tv-red:            #f85149;   /* price down, sell, negative */
+    --tv-red-muted:      #3d1a1a;   /* red badge background */
+    --tv-blue:           #388bfd;   /* active tools, links, info */
+    --tv-blue-muted:     #1a2a3d;   /* blue badge background */
+    --tv-amber:          #d29922;   /* warnings, hold rating */
+    --tv-amber-muted:    #2d2210;   /* amber badge background */
+    --tv-purple:         #a371f7;   /* AI-generated overlays */
+    --tv-purple-muted:   #271a3d;   /* purple badge background */
+
+    /* Chart-specific */
+    --tv-chart-bg:       #0d1117;
+    --tv-chart-grid:     #1c2128;
+    --tv-candle-up:      #26a69a;
+    --tv-candle-down:    #ef5350;
+    --tv-volume-up:      rgba(38, 166, 154, 0.3);
+    --tv-volume-down:    rgba(239, 83, 80, 0.3);
+    --tv-crosshair:      #484f58;
+
+    /* Drawing overlays */
+    --tv-support:        #3fb950;   /* support lines */
+    --tv-resistance:     #f85149;   /* resistance lines */
+    --tv-box:            rgba(56, 139, 253, 0.15); /* box fill */
+    --tv-box-border:     #388bfd;   /* box stroke */
+    --tv-trendline:      #d29922;   /* trendline stroke */
+    --tv-ai-overlay:     #a371f7;   /* AI-drawn overlays */
+    
+    /* Spacing & Layout */
+    --tv-space-1: 4px;
+    --tv-space-2: 8px;
+    --tv-space-3: 12px;
+    --tv-space-4: 16px;
+    --tv-space-5: 20px;
+    --tv-space-6: 24px;
+
+    /* Border Radius */
+    --tv-radius-sm: 4px;
+    --tv-radius-md: 6px;
+    --tv-radius-lg: 8px;
+    --tv-radius-xl: 12px;
+  }
+}
+
+body {
+  color: var(--tv-text-primary);
+  background: var(--tv-bg-page);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Custom Scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--tv-bg-page);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tv-bg-elevated);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tv-border-strong);
+}
+
+/* Remove default focus ring for accessibility if handled by custom styles */
+*:focus-visible {
+  outline: 1px solid var(--tv-blue);
+  outline-offset: -1px;
+}
+
+/* Animations */
+@keyframes pulse { 
+  0%, 100% { opacity: 1 } 
+  50% { opacity: 0.4 } 
+}
+
+@keyframes valueFlash { 
+  0% { color: var(--tv-blue) } 
+  100% { color: inherit } 
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.4 }
+  50% { opacity: 0.9 }
+}
+
+.animate-pulse-live {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 1.2s infinite;
+}
+
+.value-flash {
+  animation: valueFlash 600ms;
+}
