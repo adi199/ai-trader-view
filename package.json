@@ -13,6 +13,7 @@
     "@copilotkit/react-ui": "^1.56.3",
     "@copilotkit/runtime": "^1.56.3",
     "@langchain/openai": "^1.4.4",
+    "@openrouter/ai-sdk-provider": "^2.9.0",
     "clsx": "^2.1.1",
     "langchain": "^1.3.4",
     "lightweight-charts": "^5.2.0",

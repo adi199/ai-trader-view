@@ -5,8 +5,9 @@ import {
 } from "@copilotkit/runtime";
 import OpenAI from "openai";
 import { NextRequest } from "next/server";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
-const MODEL = "minimax/minimax-m2.5:free";
+const MODEL = "openai/gpt-oss-20b:free";
 
 // OpenRouter is OpenAI-API-compatible. We pass a custom OpenAI client with
 // OpenRouter's base URL so that OpenAIAdapter.getLanguageModel() automatically
@@ -17,7 +18,18 @@ const openrouterClient = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1"
 });
 
-const serviceAdapter = new OpenAIAdapter({
+class CustomOpenAIAdapter extends OpenAIAdapter {
+  // Override getLanguageModel to force CopilotRuntime to use the official OpenRouter provider
+  // for Vercel AI SDK. This avoids the Vercel AI SDK's Responses API that OpenRouter doesn't support.
+  getLanguageModel() {
+    const openrouter = createOpenRouter({
+      apiKey: process.env.OPENROUTER_API_KEY,
+    });
+    return openrouter(this.model);
+  }
+}
+
+const serviceAdapter = new CustomOpenAIAdapter({
   openai: openrouterClient,
   model: MODEL,
 });
