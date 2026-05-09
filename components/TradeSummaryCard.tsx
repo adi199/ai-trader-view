@@ -1,5 +1,4 @@
 import React from 'react';
-import { ChevronDown } from 'lucide-react';
 
 export interface TradeSummaryProps {
   symbol: string;

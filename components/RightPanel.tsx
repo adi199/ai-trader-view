@@ -34,7 +34,6 @@ export const RightPanel: React.FC = () => {
             initial: "Hello! I can help you analyze the current stock. Ask me for a trade summary or to draw support/resistance lines.",
             placeholder: "Ask about this stock..."
           }}
-          showResponseButton={true}
         />
       </div>
 

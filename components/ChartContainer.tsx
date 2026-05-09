@@ -37,11 +37,9 @@ export const ChartContainer: React.FC = () => {
       },
       rightPriceScale: {
         borderColor: '#21262d',
-        textColor: '#8b949e',
       },
       timeScale: {
         borderColor: '#21262d',
-        textColor: '#8b949e',
         timeVisible: true,
         secondsVisible: false,
         fixLeftEdge: true,
