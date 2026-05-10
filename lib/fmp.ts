@@ -1,19 +1,25 @@
 const FMP_API_KEY = process.env.NEXT_PUBLIC_FMP_API_KEY;
 
-async function fetchFMP(urlWithoutKey: string) {
+async function fetchFMP(urlWithoutKey: string, fallback: any = []) {
   if (!FMP_API_KEY) {
-    throw new Error('FMP API Key missing');
+    console.warn('FMP API Key missing');
+    return fallback;
   }
   const separator = urlWithoutKey.includes('?') ? '&' : '?';
   const url = `${urlWithoutKey}${separator}apikey=${FMP_API_KEY}`;
   
-  const response = await fetch(url);
-  if (!response.ok) {
-    const errorBody = await response.text();
-    console.error(`FMP Error [${response.status}] for ${urlWithoutKey}:`, errorBody);
-    throw new Error(`FMP API Error ${response.status}: ${errorBody}`);
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`FMP Error [${response.status}] for ${urlWithoutKey}:`, errorBody);
+      return fallback; // Graceful degradation instead of crashing Promise.all
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Network Error fetching ${urlWithoutKey}:`, error);
+    return fallback;
   }
-  return response.json();
 }
 
 export const fmp = {
@@ -30,5 +36,5 @@ export const fmp = {
   getHistoricalChart: (symbol: string, interval: string = '5min') => 
     fetchFMP(`https://financialmodelingprep.com/stable/historical-chart/${interval}?symbol=${symbol}`),
   getHistoricalPriceFull: (symbol: string) =>
-    fetchFMP(`https://financialmodelingprep.com/stable/historical-price-full?symbol=${symbol}`),
+    fetchFMP(`https://financialmodelingprep.com/stable/historical-price-full?symbol=${symbol}`, { historical: [] }),
 };

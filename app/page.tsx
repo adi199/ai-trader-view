@@ -9,11 +9,11 @@ export default function Home() {
   useCopilotSync();
 
   return (
-    <main style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden', background: 'var(--tv-bg-page)' }}>
-      <div style={{ width: '80vw', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <main className="flex w-screen h-screen overflow-hidden bg-tv-bg-page">
+      <div className="w-[80vw] flex flex-col overflow-hidden">
         <LeftPanel />
       </div>
-      <div style={{ width: '20vw', minWidth: '280px', borderLeft: '1px solid var(--tv-border-subtle)' }}>
+      <div className="w-[20vw] min-w-[280px] border-l border-tv-border-subtle">
         <RightPanel />
       </div>
     </main>

@@ -1,137 +1,154 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useMarketStore } from '../stores/marketStore';
-import { MetricCard } from './MetricCard';
+import { OverviewTab } from './fundamentals/OverviewTab';
+import { FundamentalsTab } from './fundamentals/FundamentalsTab';
+import { AnalystConsensus } from './fundamentals/AnalystConsensus';
+import { ComingSoon } from './fundamentals/ComingSoon';
+import { Range52W } from './fundamentals/Range52W';
 
 export const FundamentalsPanel: React.FC = () => {
   const market = useMarketStore();
   const isLoading = market.isLoading;
+  const [activeTab, setActiveTab] = useState('Fundamentals');
 
-  const parseWeekRange = (range: string) => {
+  const tabs = ['Overview', 'News', 'Fundamentals', 'Technicals', 'Analyst'];
+
+  // Memoize range calculations to avoid re-calculating on every render
+  const { low, high } = useMemo(() => {
+    const range = market.weekRange || '';
     const parts = range.split('-').map(p => parseFloat(p.trim().replace('$', '')));
     if (parts.length === 2) return { low: parts[0] || 0, high: parts[1] || 0 };
     return { low: 0, high: 0 };
+  }, [market.weekRange]);
+
+  // Format price change data
+  const { priceChangeStr, pctChangeStr, priceColorClass } = useMemo(() => {
+    const priceChange = market.price * (market.changePercentage / 100);
+    return {
+      priceChangeStr: priceChange >= 0 ? `+$${priceChange.toFixed(2)}` : `-$${Math.abs(priceChange).toFixed(2)}`,
+      pctChangeStr: market.changePercentage >= 0 ? `(+${market.changePercentage.toFixed(2)}%)` : `(${market.changePercentage.toFixed(2)}%)`,
+      priceColorClass: market.changePercentage >= 0 ? 'text-tv-green' : 'text-tv-red'
+    };
+  }, [market.price, market.changePercentage]);
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'Overview':
+        return <OverviewTab market={market} isLoading={isLoading} low={low} high={high} />;
+      case 'Fundamentals':
+        return <FundamentalsTab market={market} isLoading={isLoading} low={low} high={high} />;
+      case 'Analyst':
+        return (
+          <AnalystConsensus 
+            rating={market.analystRating}
+            targetLow={market.targetLow}
+            targetHigh={market.targetHigh}
+            priceTarget={market.priceTarget}
+            currentPrice={market.price}
+          />
+        );
+      case 'News':
+        return (
+          <ComingSoon 
+            icon="📰" 
+            title="News feed coming soon" 
+            description={`We're integrating real-time sentiment analysis for ${market.symbol}`} 
+          />
+        );
+      case 'Technicals':
+        return (
+          <ComingSoon 
+            icon="📊" 
+            title="Technical analysis coming soon" 
+            description={`Advanced oscillators and moving averages for ${market.symbol}`} 
+          />
+        );
+      default:
+        return null;
+    }
   };
 
-  const { low, high } = parseWeekRange(market.weekRange);
-  const rangePercent = high > low ? ((market.price - low) / (high - low)) * 100 : 0;
-  
-  // Format price change
-  const priceChange = market.price * (market.changePercentage / 100);
-  const priceChangeStr = priceChange >= 0 ? `+$${priceChange.toFixed(2)}` : `-$${Math.abs(priceChange).toFixed(2)}`;
-  const pctChangeStr = market.changePercentage >= 0 ? `(+${market.changePercentage.toFixed(2)}%)` : `(${market.changePercentage.toFixed(2)}%)`;
-  const priceColor = market.changePercentage >= 0 ? 'var(--tv-green)' : 'var(--tv-red)';
-
-  const SectionLabel = ({ text, color }: { text: string, color: string }) => (
-    <div style={{ fontSize: '11px', fontWeight: 500, color, marginBottom: '12px' }}>
-      {text.charAt(0).toUpperCase() + text.slice(1)}
-    </div>
-  );
-
-  const Divider = () => (
-    <div style={{ width: '1px', height: '100%', background: 'var(--tv-border-subtle)', margin: '0 8px' }} />
-  );
-
   return (
-    <div style={{
-      height: '200px',
-      background: 'var(--tv-bg-panel)',
-      borderTop: '1px solid var(--tv-border-subtle)',
-      padding: '12px 16px',
-      overflow: 'hidden',
-      display: 'flex',
-      gap: '16px'
-    }}>
-      {/* Section 1: Price & volume */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <SectionLabel text="price & volume" color="var(--tv-green)" />
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px' }}>
-          {isLoading ? (
-            <div style={{ width: '80px', height: '28px', background: 'var(--tv-bg-overlay)', borderRadius: '4px' }} className="animate-shimmer" />
-          ) : (
-            <span className="value-flash" style={{ fontSize: '28px', fontWeight: 500, color: 'var(--tv-text-primary)' }}>
-              ${market.price.toFixed(2)}
-            </span>
-          )}
-          {isLoading ? (
-            <div style={{ width: '60px', height: '13px', background: 'var(--tv-bg-overlay)', borderRadius: '3px' }} className="animate-shimmer" />
-          ) : (
-            <span className="value-flash" style={{ fontSize: '13px', color: priceColor }}>
-              {priceChangeStr} {pctChangeStr}
-            </span>
-          )}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
-          <MetricCard label="Volume" value={market.volume} formatter="number" isLoading={isLoading} />
-          <MetricCard label="Avg Volume" value={market.volume} formatter="number" isLoading={isLoading} />
-          <MetricCard label="Market Cap" value={market.marketCap} formatter="number" isLoading={isLoading} />
-          <MetricCard label="Beta" value={market.beta} formatter="number" isLoading={isLoading} />
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '11px', color: 'var(--tv-text-secondary)', whiteSpace: 'nowrap' }}>52w</span>
-          <span style={{ fontSize: '11px', color: 'var(--tv-text-secondary)', whiteSpace: 'nowrap' }}>${low.toFixed(0)}</span>
-          <div style={{ flex: 1, height: '3px', background: 'var(--tv-border-subtle)', borderRadius: '2px', position: 'relative' }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, rangePercent))}%`, background: 'var(--tv-blue)', borderRadius: '2px' }} />
-            <div style={{ position: 'absolute', left: `calc(${Math.max(0, Math.min(100, rangePercent))}% - 4px)`, top: '-2.5px', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--tv-text-primary)', border: '2px solid var(--tv-bg-panel)' }} />
-          </div>
-          <span style={{ fontSize: '11px', color: 'var(--tv-text-secondary)', whiteSpace: 'nowrap' }}>${high.toFixed(0)}</span>
-        </div>
+    <div className="flex flex-col min-h-full pb-10 bg-tv-bg-page">
+      {/* Navigation Tabs */}
+      <div className="flex items-center justify-center px-8 border-b border-tv-border-subtle bg-tv-bg-panel sticky top-0 z-20 shadow-md">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-5 py-3.5 text-[14px] font-medium border-b-[3px] transition-all ${
+              activeTab === tab
+                ? 'text-tv-text-primary border-tv-blue bg-tv-bg-elevated/30'
+                : 'text-tv-text-secondary border-transparent hover:text-tv-text-primary hover:bg-tv-bg-elevated/20'
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
-      <Divider />
-
-      {/* Section 2: Valuation */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <SectionLabel text="valuation" color="var(--tv-blue)" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr 1fr', gap: '12px 8px', flex: 1 }}>
-          <MetricCard label="P/E (TTM)" value={market.pe} formatter="number" isLoading={isLoading} />
-          <MetricCard label="P/S (TTM)" value={market.ps} formatter="number" isLoading={isLoading} />
-          <MetricCard label="P/FCF" value={market.pfcf} formatter="number" isLoading={isLoading} />
-          <MetricCard label="EV/EBITDA" value={market.evEbitda} formatter="number" isLoading={isLoading} />
-          <MetricCard label="Div yield" value={market.dividendYield} formatter="percent" isLoading={isLoading} />
-          <MetricCard label="EPS TTM" value={0} formatter="currency" isLoading={isLoading} />
-        </div>
-      </div>
-
-      <Divider />
-
-      {/* Section 3: Profitability */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <SectionLabel text="profitability" color="var(--tv-amber)" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr 1fr', gap: '12px 8px', flex: 1 }}>
-          <MetricCard label="Gross margin" value={market.grossMargin} formatter="percent" colorRule="margin" isLoading={isLoading} />
-          <MetricCard label="Net margin" value={market.netMargin} formatter="percent" colorRule="margin" isLoading={isLoading} />
-          <MetricCard label="Op margin" value={0} formatter="percent" colorRule="margin" isLoading={isLoading} />
-          <MetricCard label="ROE" value={market.roe} formatter="percent" colorRule="margin" isLoading={isLoading} />
-          <MetricCard label="ROIC" value={0} formatter="percent" colorRule="margin" isLoading={isLoading} />
-          <MetricCard label="FCF/share" value={0} formatter="currency" colorRule="none" isLoading={isLoading} />
-        </div>
-      </div>
-
-      <Divider />
-
-      {/* Section 4: Analyst consensus */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <SectionLabel text="analyst consensus" color="var(--tv-purple)" />
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '16px' }}>
-          <div style={{ fontSize: '16px', fontWeight: 500, color: 'var(--tv-green)' }}>
-            Strong Buy
-          </div>
-          <div style={{ width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--tv-text-primary)' }}>$315.91</span>
-              <span style={{ fontSize: '13px', color: 'var(--tv-green)' }}>+16.5%</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '11px', color: 'var(--tv-text-secondary)' }}>$239</span>
-              <div style={{ flex: 1, height: '3px', background: 'var(--tv-border-subtle)', borderRadius: '2px', position: 'relative' }}>
-                <div style={{ position: 'absolute', left: '60%', top: '-2.5px', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--tv-purple)' }} />
+      <div className="px-6 md:px-12 py-8 max-w-[1200px] w-full mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+        
+        {/* Main Header Area */}
+        <div className="grid grid-cols-2 md:grid-cols-3 items-center gap-8 mb-10 px-1">
+          {/* Price Section */}
+          <div className="flex flex-col">
+            <div className="flex items-center gap-3 mb-1">
+              <span className="text-[38px] font-bold text-tv-text-primary tracking-tight">
+                ${market.price.toFixed(2)}
+              </span>
+              <div className={`px-2 py-0.5 rounded flex items-center gap-1 ${market.changePercentage >= 0 ? 'bg-tv-green/10 text-tv-green' : 'bg-tv-red/10 text-tv-red'}`}>
+                <span className="text-[14px] font-semibold">{priceChangeStr}</span>
               </div>
-              <span style={{ fontSize: '11px', color: 'var(--tv-text-secondary)' }}>$350</span>
+            </div>
+            <div className="text-[14px] text-tv-text-secondary font-medium flex items-center gap-2">
+              <span>{market.symbol}</span>
+              <span>·</span>
+              <span>{market.exchange || 'NASDAQ'}</span>
+              <span>·</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-tv-green animate-pulse" />
+                <span>Market Open</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Range Section (Center) */}
+          <div className="hidden lg:flex justify-center w-full">
+            <Range52W low={low} high={high} current={market.price} />
+          </div>
+          
+          {/* Target Section (Right) */}
+          <div className="text-left md:text-right hidden sm:block">
+            <div className="text-[12px] text-tv-text-secondary font-semibold uppercase tracking-widest mb-1 opacity-70">
+              Analyst price target
+            </div>
+            <div className="text-[30px] font-bold text-tv-text-primary mb-2">
+              ${market.priceTarget || '—'}
+            </div>
+            <div className="inline-block px-3 py-1 bg-tv-blue/10 text-tv-blue border border-tv-blue/20 rounded-lg text-[13px] font-semibold">
+              ↗ {market.priceTarget ? `${(((market.priceTarget - market.price) / market.price) * 100).toFixed(1)}% upside` : '—'}
             </div>
           </div>
         </div>
-      </div>
 
+        {/* Tab Content Rendering */}
+        <div className="transition-all duration-300">
+          {renderTabContent()}
+        </div>
+        
+        {/* Footer */}
+        <div className="flex flex-col md:flex-row justify-between items-center text-[12px] text-tv-text-secondary mt-12 pt-6 border-t border-tv-border-subtle/50 gap-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-tv-green" />
+            <span>Data synced with FMP Real-time</span>
+          </div>
+          <div className="flex gap-6">
+            <span>{market.exchange || 'NASDAQ'} · USD</span>
+            <span>Refreshed {market.lastUpdated?.toLocaleTimeString()}</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

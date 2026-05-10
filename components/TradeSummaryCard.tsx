@@ -41,74 +41,64 @@ export const TradeSummaryCard: React.FC<TradeSummaryProps> = ({
   riskLevel,
 }) => {
   const isPositive = change >= 0;
-  const priceColor = isPositive ? 'var(--tv-green)' : 'var(--tv-red)';
+  const priceColorClass = isPositive ? 'text-tv-green' : 'text-tv-red';
   
   const upsideValue = metrics?.upside || '+16.5%';
-  const upsideColor = upsideValue.startsWith('+') ? 'var(--tv-green)' : upsideValue.startsWith('-') ? 'var(--tv-red)' : 'var(--tv-text-primary)';
+  const upsideColorClass = upsideValue.startsWith('+') ? 'text-tv-green' : upsideValue.startsWith('-') ? 'text-tv-red' : 'text-tv-text-primary';
 
-  const recColors = {
-    buy: { bg: 'var(--tv-green-muted)', color: 'var(--tv-green)' },
-    sell: { bg: 'var(--tv-red-muted)', color: 'var(--tv-red)' },
-    hold: { bg: 'var(--tv-amber-muted)', color: 'var(--tv-amber)' }
+  const recClasses = {
+    buy: 'bg-tv-green-muted text-tv-green',
+    sell: 'bg-tv-red-muted text-tv-red',
+    hold: 'bg-tv-amber-muted text-tv-amber'
   };
 
-  const currentRecColor = recColors[recommendation] || recColors.hold;
+  const currentRecClass = recClasses[recommendation] || recClasses.hold;
 
   return (
-    <div style={{
-      background: 'var(--tv-bg-elevated)',
-      borderRadius: '8px',
-      padding: '24px',
-      margin: '16px 0',
-      border: '1px solid var(--tv-border-subtle)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '24px',
-      maxWidth: '600px'
-    }}>
+    <div className="bg-tv-bg-elevated rounded-lg p-6 my-4 border border-tv-border-subtle flex flex-col gap-6 max-w-[600px]">
       {/* Header */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-          <h2 style={{ fontSize: '24px', fontWeight: 500, color: 'var(--tv-text-primary)', margin: 0 }}>{symbol}</h2>
-          <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--tv-text-secondary)' }}>{companyName}</span>
+      <div className="flex flex-col gap-1">
+        <div className="flex items-baseline gap-2">
+          <h2 className="text-[24px] font-medium text-tv-text-primary m-0">{symbol}</h2>
+          <span className="text-[15px] font-medium text-tv-text-secondary">{companyName}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ fontSize: '28px', fontWeight: 500, color: 'var(--tv-text-primary)' }}>${price.toFixed(2)}</span>
-          <span style={{ fontSize: '15px', fontWeight: 500, color: priceColor }}>
+        <div className="flex items-center gap-3">
+          <span className="text-[28px] font-medium text-tv-text-primary">${price.toFixed(2)}</span>
+          <span className={`text-[15px] font-medium ${priceColorClass}`}>
             {isPositive ? '+' : ''}{change.toFixed(2)} ({changePercentage.toFixed(2)}%)
           </span>
-          <span style={{ fontSize: '12px', color: 'var(--tv-text-secondary)' }}>5 min · {exchange}</span>
+          <span className="text-[12px] text-tv-text-secondary">5 min · {exchange}</span>
         </div>
       </div>
 
       {/* Badges */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-        <span style={{ padding: '4px 12px', background: 'var(--tv-bg-panel)', color: 'var(--tv-text-secondary)', borderRadius: '16px', fontSize: '11px', fontWeight: 500, border: '1px solid var(--tv-border-subtle)' }}>
+      <div className="flex flex-wrap gap-2">
+        <span className="px-3 py-1 bg-tv-bg-panel text-tv-text-secondary rounded-2xl text-[11px] font-medium border border-tv-border-subtle">
           {sector}
         </span>
-        <span style={{ padding: '4px 12px', background: 'var(--tv-bg-panel)', color: 'var(--tv-text-secondary)', borderRadius: '16px', fontSize: '11px', fontWeight: 500, border: '1px solid var(--tv-border-subtle)' }}>
+        <span className="px-3 py-1 bg-tv-bg-panel text-tv-text-secondary rounded-2xl text-[11px] font-medium border border-tv-border-subtle">
           {industry}
         </span>
-        <span style={{ padding: '4px 12px', background: currentRecColor.bg, color: currentRecColor.color, borderRadius: '16px', fontSize: '11px', fontWeight: 500 }}>
+        <span className={`px-3 py-1 rounded-2xl text-[11px] font-medium ${currentRecClass}`}>
           {recommendation.toUpperCase()} · ${targetPrice} target
         </span>
       </div>
 
       {/* Metrics Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px 48px', paddingTop: '16px' }}>
+      <div className="grid grid-cols-2 gap-x-12 gap-y-6 pt-4">
         {[
           { label: 'P/E (TTM)', value: metrics?.pe || '33.9×' },
           { label: 'Net margin', value: metrics?.netMargin || '27.0%' },
           { label: 'EV/EBITDA', value: metrics?.evEbitda || '26.3×' },
           { label: 'FCF/share', value: metrics?.fcfPerShare || '$8.36' },
           { label: 'Volume', value: metrics?.volume || '38.2M' },
-          { label: 'Upside', value: upsideValue, color: upsideColor },
+          { label: 'Upside', value: upsideValue, colorClass: upsideColorClass },
         ].map((m, i) => (
           <div key={i}>
-            <div style={{ fontSize: '10px', color: 'var(--tv-text-secondary)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>
+            <div className="text-[10px] text-tv-text-secondary font-medium uppercase tracking-wider mb-1">
               {m.label}
             </div>
-            <div style={{ fontSize: '15px', fontWeight: 500, color: m.color || 'var(--tv-text-primary)' }}>
+            <div className={`text-[15px] font-medium ${m.colorClass || 'text-tv-text-primary'}`}>
               {m.value}
             </div>
           </div>

@@ -6,26 +6,20 @@ import "@copilotkit/react-ui/styles.css";
 
 export const RightPanel: React.FC = () => {
   return (
-    <div style={{ width: '100%', height: '100%', background: 'var(--tv-bg-panel)', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ 
-        padding: '12px 16px', 
-        borderBottom: '1px solid var(--tv-border-subtle)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px'
-      }}>
-        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--tv-purple)' }} />
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--tv-text-primary)', lineHeight: 1 }}>
+    <div className="w-full h-full bg-tv-bg-panel flex flex-col">
+      <div className="p-3 px-4 border-b border-tv-border-subtle flex items-center gap-2">
+        <div className="w-2 h-2 rounded-full bg-tv-purple" />
+        <div className="flex flex-col">
+          <span className="text-[13px] font-medium text-tv-text-primary leading-none">
             AI Traderview
           </span>
-          <span style={{ fontSize: '11px', color: 'var(--tv-text-secondary)', marginTop: '2px' }}>
+          <span className="text-[11px] text-tv-text-secondary mt-0.5">
             Ask me to draw levels or analyze
           </span>
         </div>
       </div>
       
-      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div className="flex-1 overflow-hidden flex flex-col">
         <CopilotChat
           className="h-full"
           instructions="You are an expert financial analyst. You can help users analyze charts, draw support/resistance lines, and provide fundamental insights. Use the tools provided to interact with the chart. When providing a final analysis or recommendation, use the 'generate_trade_summary' tool to present a professional report card to the user."

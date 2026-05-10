@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type IndicatorType = 'RSI' | 'MACD' | 'BB';
+export type IndicatorType = 'RSI' | 'MACD' | 'BB' | 'SMA5' | 'SMA20' | 'SMA50' | 'EMA5' | 'EMA20' | 'EMA50';
 
 interface IndicatorState {
   activeIndicators: IndicatorType[];

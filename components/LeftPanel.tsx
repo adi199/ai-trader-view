@@ -20,12 +20,12 @@ export const LeftPanel: React.FC = () => {
   useFMPData();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', background: 'var(--tv-bg-page)' }}>
+    <div className="flex flex-col h-full w-full bg-tv-bg-page">
       <TopBar />
-      <div style={{ height: 'calc(100vh - 48px - 200px)', width: '100%', overflow: 'hidden' }}>
+      <div className="h-[calc(100vh-48px-400px)] w-full overflow-hidden">
         <ChartContainer />
       </div>
-      <div style={{ height: '200px', width: '100%', overflow: 'hidden' }}>
+      <div className="h-[400px] w-full overflow-y-auto custom-scrollbar border-t border-tv-border-subtle bg-tv-bg-page">
         <FundamentalsPanel />
       </div>
     </div>

@@ -1,6 +1,54 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-tv-bg-page: var(--tv-bg-page);
+  --color-tv-bg-panel: var(--tv-bg-panel);
+  --color-tv-bg-elevated: var(--tv-bg-elevated);
+  --color-tv-bg-overlay: var(--tv-bg-overlay);
+
+  --color-tv-border-subtle: var(--tv-border-subtle);
+  --color-tv-border-default: var(--tv-border-default);
+  --color-tv-border-strong: var(--tv-border-strong);
+
+  --color-tv-text-primary: var(--tv-text-primary);
+  --color-tv-text-secondary: var(--tv-text-secondary);
+  --color-tv-text-tertiary: var(--tv-text-tertiary);
+
+  --color-tv-green: var(--tv-green);
+  --color-tv-green-muted: var(--tv-green-muted);
+  --color-tv-red: var(--tv-red);
+  --color-tv-red-muted: var(--tv-red-muted);
+  --color-tv-blue: var(--tv-blue);
+  --color-tv-blue-muted: var(--tv-blue-muted);
+  --color-tv-amber: var(--tv-amber);
+  --color-tv-amber-muted: var(--tv-amber-muted);
+  --color-tv-purple: var(--tv-purple);
+  --color-tv-purple-muted: var(--tv-purple-muted);
+  --color-tv-yellow: var(--tv-yellow);
+  --color-tv-orange: var(--tv-orange);
+
+  --animate-value-flash: valueFlash 600ms;
+  --animate-shimmer: shimmer 1.2s infinite;
+
+  --radius-tv-sm: var(--tv-radius-sm);
+  --radius-tv-md: var(--tv-radius-md);
+  --radius-tv-lg: var(--tv-radius-lg);
+  --radius-tv-xl: var(--tv-radius-xl);
+
+  --spacing-tv-1: var(--tv-space-1);
+  --spacing-tv-2: var(--tv-space-2);
+  --spacing-tv-3: var(--tv-space-3);
+  --spacing-tv-4: var(--tv-space-4);
+  --spacing-tv-5: var(--tv-space-5);
+  --spacing-tv-6: var(--tv-space-6);
+
+  /* Ensure breakpoints are explicitly defined if defaults aren't being picked up */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
 
 @layer base {
   :root {
@@ -31,6 +79,8 @@
     --tv-amber-muted:    #2d2210;   /* amber badge background */
     --tv-purple:         #a371f7;   /* AI-generated overlays */
     --tv-purple-muted:   #271a3d;   /* purple badge background */
+    --tv-yellow:         #f1e05a;
+    --tv-orange:         #e34c26;
 
     /* Chart-specific */
     --tv-chart-bg:       #0d1117;

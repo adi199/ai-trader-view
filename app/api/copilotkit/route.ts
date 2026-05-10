@@ -3,37 +3,24 @@ import {
   OpenAIAdapter,
   copilotRuntimeNextJSAppRouterEndpoint,
 } from "@copilotkit/runtime";
-import OpenAI from "openai";
 import { NextRequest } from "next/server";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
-const MODEL = "openai/gpt-oss-20b:free";
+// Use a model with proper OpenAI-compatible tool/function calling support.
+// Avoid models like gpt-oss-20b that use non-standard constrained-decoding
+// tokens (<|constrain|>) which break OpenRouter's streaming layer.
+const MODEL = "nvidia/nemotron-3-super-120b-a12b:free";
 
-// OpenRouter is OpenAI-API-compatible. We pass a custom OpenAI client with
-// OpenRouter's base URL so that OpenAIAdapter.getLanguageModel() automatically
-// builds a createOpenAI() provider pointed at the correct endpoint.
-console.log("OPENROUTER_API_KEY", process.env.OPENROUTER_API_KEY);
-const openrouterClient = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY,
-  baseURL: "https://openrouter.ai/api/v1"
-});
-
-class CustomOpenAIAdapter extends OpenAIAdapter {
-  // Override getLanguageModel to force CopilotRuntime to use the official OpenRouter provider
-  // for Vercel AI SDK. This avoids the Vercel AI SDK's Responses API that OpenRouter doesn't support.
+// CopilotKit's OpenAIAdapter requires an openai client in its constructor,
+// but we override getLanguageModel() to use the OpenRouter Vercel AI SDK
+// provider directly — avoiding the Responses API that OpenRouter doesn't support.
+class OpenRouterAdapter extends OpenAIAdapter {
   getLanguageModel() {
-    const openrouter = createOpenRouter({
-      apiKey: process.env.OPENROUTER_API_KEY,
-    });
-    return openrouter(this.model);
+    return createOpenRouter({ apiKey: process.env.OPENROUTER_API_KEY })(this.model);
   }
 }
 
-const serviceAdapter = new CustomOpenAIAdapter({
-  openai: openrouterClient,
-  model: MODEL,
-});
-
+const serviceAdapter = new OpenRouterAdapter({ model: MODEL });
 const runtime = new CopilotRuntime();
 
 export async function POST(req: NextRequest) {

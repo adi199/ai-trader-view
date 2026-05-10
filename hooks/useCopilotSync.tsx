@@ -53,6 +53,7 @@ export function useCopilotSync() {
         color: "#26a69a",
         label: label || "Support"
       });
+      return `Support line drawn at $${price}.`;
     }
   });
 
@@ -71,6 +72,7 @@ export function useCopilotSync() {
         color: "#ef5350",
         label: label || "Resistance"
       });
+      return `Resistance line drawn at $${price}.`;
     }
   });
 
@@ -95,6 +97,7 @@ export function useCopilotSync() {
         color: "rgba(56, 139, 253, 0.15)",
         label: label || "Box"
       });
+      return `Box drawn from $${priceLow} to $${priceHigh}.`;
     }
   });
 
@@ -108,6 +111,7 @@ export function useCopilotSync() {
     ],
     handler: () => {
       clearAll();
+      return "All drawings have been cleared.";
     }
   });
 
@@ -119,6 +123,7 @@ export function useCopilotSync() {
     ],
     handler: ({ symbol }) => {
       market.setSymbol(symbol.toUpperCase());
+      return `Symbol changed to ${symbol.toUpperCase()}.`;
     }
   });
 
@@ -126,10 +131,11 @@ export function useCopilotSync() {
     name: "add_indicator",
     description: "Toggle a technical indicator on the chart",
     parameters: [
-      { name: "type", type: "string", enum: ["RSI", "MACD", "BB"], description: "The type of indicator to toggle", required: true }
+      { name: "type", type: "string", enum: ["RSI", "MACD", "BB", "SMA5", "SMA20", "SMA50", "EMA5", "EMA20", "EMA50"], description: "The type of indicator to toggle", required: true }
     ],
     handler: ({ type }) => {
       toggleIndicator(type as any);
+      return `${type} indicator toggled.`;
     }
   });
 
